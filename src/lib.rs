@@ -7,7 +7,7 @@ pub fn send_log(message: &str) -> io::Result<()> {
     let destino = "127.0.0.1:8080";
 
     let timestamp = Local::now().format("[%Y-%m-%d %H:%M:%S]").to_string();
-    let formatted = format!("{} {}\n", timestamp, message);
+    let formatted = format!("\x1b[90m{}\x1b[0m {}\n", timestamp, message);
 
     socket.send_to(formatted.as_bytes(), destino)?;
     Ok(())
