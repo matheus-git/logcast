@@ -6,6 +6,8 @@ A simple helper that sends logs over UDP, for programs without terminal output, 
 
 ## Usage
 
+    cargo add logcast
+
 I recommend creating a macro. Specify the address and port where the client will listen for logs. To view the logs, open another terminal and run a program that listens for UDP messages without exiting, such as ```ncat -ul --keep-open 8080```, as shown in the example below.
 
     use logcast::send_log;
