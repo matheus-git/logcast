@@ -2,7 +2,7 @@
 
 ![rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)
 
-A simple helper that sends logs over UDP, for programs without terminal output, such as TUIs.
+A simple helper that sends logs over TCP, for programs without terminal output, such as TUIs.
 
 ## Example
 
@@ -12,7 +12,7 @@ A simple helper that sends logs over UDP, for programs without terminal output, 
 
     cargo add logcast
 
-I recommend creating a macro. Specify the address and port where the client will listen for logs. To view the logs, open another terminal and run a program that listens for UDP messages without exiting, such as ```ncat -ul --keep-open 8080```, as shown in the example below.
+I recommend creating a macro. Specify the address and port where the client will listen for logs. To view the logs, open another terminal and run a program that listens for TCP connections, such as ```ncat -l --keep-open 8080```, as shown in the example below.
 
     use logcast::send_log;
     
