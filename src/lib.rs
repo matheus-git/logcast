@@ -10,20 +10,20 @@
 //!
 //! ## Usage
 //!
-//! ### Add logcast and once_cell
+//! ### Add logcast
 //! ```shell
-//!     cargo add logcast once_cell
+//!     cargo add logcast
 //! ```
 //!
 //! ### Create Macro
-//! This code defines a global, thread-safe TCP logger using a singleton (LOGGER) initialized lazily with once_cell::sync::Lazy.
+//! This code defines a global, thread-safe TCP logger using a singleton (LOGGER) initialized lazily.
 //!
 //! ```rust
 //! // src/macros/log/mod.rs
 //! use logcast::Logger;
-//! use once_cell::sync::Lazy;
+//! use std::sync::LazyLock;
 //!
-//! pub static LOGGER: Lazy<Logger> = Lazy::new(|| Logger::new("127.0.0.1:8080"));
+//! pub static LOGGER: LazyLock<Logger> = LazyLock::new(|| Logger::new("127.0.0.1:8080"));
 //!
 //! #[macro_export]
 //! macro_rules! log {
