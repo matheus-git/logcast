@@ -11,8 +11,9 @@
 //! ## Usage
 //!
 //! ### Add logcast and once_cell
-//!
+//! ```shell
 //!     cargo add logcast once_cell
+//! ```
 //!
 //! ### Create Macro
 //! This code defines a global, thread-safe TCP logger using a singleton (LOGGER) initialized lazily with once_cell::sync::Lazy.
@@ -51,11 +52,11 @@
 //!
 //! ### Output
 //! To view the logs, open another terminal and run a program that listens for TCP connections, such as ```ncat -l --keep-open 8080```, as shown in the example below.
-//!
+//!```shell
 //!     └─$ ncat -l --keep-open 8080
 //!     [2025-11-10 20:55:04] Test
 //!     [2025-11-10 20:55:04] Service { name: "cron.service", description: "Regular background program processing daemon", state: ServiceState { load: "loaded", active: "active", sub: "running", file: "enabled" } }
-//!
+//!```
 //! ## 📝 License
 //!
 //! This project is open-source under the MIT License.
