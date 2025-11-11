@@ -10,24 +10,41 @@ A simple helper that sends logs over TCP, for programs without terminal output, 
 
 ## Usage
 
-    cargo add logcast
+### Add logcast and once_cell
 
-I recommend creating a macro. Specify the address and port where the client will listen for logs. To view the logs, open another terminal and run a program that listens for TCP connections, such as ```ncat -l --keep-open 8080```, as shown in the example below.
+    cargo add logcast once_cell
 
-    use logcast::send_log;
+### Create Macro
+This code defines a global, thread-safe TCP logger using a singleton (LOGGER) initialized lazily with once_cell::sync::Lazy.
+
+    // src/macros/log/mod.rs
+    use logcast::Logger;
+    use once_cell::sync::Lazy;
     
+    pub static LOGGER: Lazy<Logger> = Lazy::new(|| Logger::new("127.0.0.1:8080"));
+    
+    #[macro_export]
     macro_rules! log {
-        ($msg:expr) => {
-            if let Err(e) = send_log($msg, "127.0.0.1:8080") {
-                eprintln!("Error: {}", e);   
-            }
-        };
+        ($($arg:tt)*) => {{
+            $crate::LOGGER.log(&format!($($arg)*));
+        }};
     }
 
-    log!("Test");
-    log!(&format!("{:?}", service));
+### Import LOGGER
+Import LOGGER in main.rs to allow the macro to access it from any module.
 
-Output:
+    // src/main.rs
+    use macros::log::LOGGER;
+
+### Import macro
+
+    use crate::log;
+    
+    log!("Test");
+    log!("{:?}", service);
+
+### Output
+To view the logs, open another terminal and run a program that listens for TCP connections, such as ```ncat -l --keep-open 8080```, as shown in the example below.
 
     └─$ ncat -ul --keep-open 8080 
     [2025-11-10 20:55:04] Test
