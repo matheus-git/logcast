@@ -10,7 +10,7 @@ A simple helper that sends logs over TCP, for programs without terminal output, 
 
 ## Usage
 
-See "log" example for example with integration with [log]("https://docs.rs/log/latest/log/index.html") crate
+See `examples/log.rs` for an example of integration with the [log](https://docs.rs/log/latest/log/index.html) crate.
 
 ### Add logcast
 
