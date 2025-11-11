@@ -10,6 +10,8 @@ A simple helper that sends logs over TCP, for programs without terminal output, 
 
 ## Usage
 
+See "log" example for example with integration with [log]("https://docs.rs/log/latest/log/index.html") crate
+
 ### Add logcast and once_cell
 
     cargo add logcast once_cell

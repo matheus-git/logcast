@@ -7,4 +7,4 @@ license = "MIT"
 
 [dependencies]
 chrono = { version = "0.4", features = ["clock"] }
-
+log = { version = "0.4.28", features = ["std"] }

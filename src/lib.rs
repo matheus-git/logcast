@@ -1,29 +1,30 @@
 //! # logcast
-//! 
+//!
 //! ![rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)
-//! 
+//!
 //! A simple helper that sends logs over TCP, for programs without terminal output, such as TUIs.
-//! 
+//!
 //! ## Example
-//! 
+//!
 //! ![logcast](https://raw.githubusercontent.com/matheus-git/logcast/main/screenshots/logcast.gif)
-//! 
+//!
 //! ## Usage
-//! 
+//!
 //! ### Add logcast and once_cell
-//! 
+//! ```shell
 //!     cargo add logcast once_cell
-//! 
+//! ```
+//!
 //! ### Create Macro
 //! This code defines a global, thread-safe TCP logger using a singleton (LOGGER) initialized lazily with once_cell::sync::Lazy.
-//! 
+//!
 //! ```rust
 //! // src/macros/log/mod.rs
 //! use logcast::Logger;
 //! use once_cell::sync::Lazy;
-//! 
+//!
 //! pub static LOGGER: Lazy<Logger> = Lazy::new(|| Logger::new("127.0.0.1:8080"));
-//! 
+//!
 //! #[macro_export]
 //! macro_rules! log {
 //!     ($($arg:tt)*) => {{
@@ -31,41 +32,44 @@
 //!     }};
 //! }
 //! ```
-//! 
+//!
 //! ### Import LOGGER
 //! Import LOGGER in main.rs to allow the macro to access it from any module.
-//! 
+//!
 //! ```rust
 //! // src/main.rs
 //! use macros::log::LOGGER;
 //! ```
-//! 
+//!
 //! ### Import macro
-//! 
+//!
 //! ```rust
 //! use crate::log;
-//! 
+//!
 //! log!("Test");
 //! log!("{:?}", service);
 //! ```
-//! 
+//!
 //! ### Output
 //! To view the logs, open another terminal and run a program that listens for TCP connections, such as ```ncat -l --keep-open 8080```, as shown in the example below.
-//! 
-//!     └─$ ncat -l --keep-open 8080 
+//!```shell
+//!     └─$ ncat -l --keep-open 8080
 //!     [2025-11-10 20:55:04] Test
 //!     [2025-11-10 20:55:04] Service { name: "cron.service", description: "Regular background program processing daemon", state: ServiceState { load: "loaded", active: "active", sub: "running", file: "enabled" } }
-//! 
+//!```
 //! ## 📝 License
-//! 
+//!
 //! This project is open-source under the MIT License.
 
+mod log;
+pub use log::init_on_addr;
+
+use chrono::Local;
+use std::io::Write;
+use std::net::TcpStream;
 use std::sync::mpsc::{self, Sender};
 use std::thread;
-use std::net::TcpStream;
-use std::io::Write;
 use std::time::Duration;
-use chrono::Local;
 
 pub struct Logger {
     tx: Sender<String>,
@@ -77,45 +81,64 @@ impl Logger {
         let addr = address.to_string();
 
         thread::spawn(move || {
-            let mut stream = loop {
-                match TcpStream::connect(&addr) {
-                    Ok(s) => break s,
-                    Err(e) => {
-                        eprintln!("Error connecting to server: {}, retrying in 1s...", e);
-                        thread::sleep(Duration::from_secs(1));
-                    }
-                }
-            };
-
+            let mut stream = tcp_connect(&addr);
             while let Ok(msg) = rx.recv() {
-                let timestamp = Local::now().format("[%Y-%m-%d %H:%M:%S]").to_string();
-                let formatted = format!("\x1b[90m{}\x1b[0m {}\n", timestamp, msg);
-
-                if let Err(e) = stream.write_all(formatted.as_bytes()) {
-                    eprintln!("Error sending log: {}, reconnecting...", e);
-                    stream = loop {
-                        match TcpStream::connect(&addr) {
-                            Ok(s) => break s,
-                            Err(e) => {
-                                eprintln!("Error reconnecting to server: {}, retrying in 1s...", e);
-                                thread::sleep(Duration::from_secs(1));
-                            }
-                        }
-                    };
-
-                    if let Err(e) = stream.write_all(formatted.as_bytes()) {
-                        eprintln!("Failed to send log after reconnect: {}", e);
-                    }
-                }
+                send_str_retry(&mut stream, &addr, &msg);
             }
         });
 
         Self { tx }
     }
 
+    ///
+    /// Logs message formatted with a timestamp
+    ///
     pub fn log(&self, message: &str) {
+        let formatted = format_log(message);
+        self.log_raw(formatted);
+    }
+
+    ///
+    /// Logs the message without formatting
+    ///
+    pub fn log_raw(&self, message: impl ToString) {
         if let Err(e) = self.tx.send(message.to_string()) {
-            eprintln!("Error sending message to queue: {}", e);
+            eprintln!("Error sending message to queue: {e}");
         }
     }
+}
+
+///
+/// Sends the message using given TcpStream. Attemtpts to reconnect and tries again if fails first time
+///
+fn send_str_retry(stream: &mut TcpStream, addr: &str, message: &str) {
+    if let Err(e) = stream.write_all(message.as_bytes()) {
+        eprintln!("Error sending log: {e}, reconnecting...");
+        *stream = tcp_connect(addr);
+        if let Err(e) = stream.write_all(message.as_bytes()) {
+            eprintln!("Failed to send log after reconnect: {e}");
+        }
+    }
+}
+///
+/// Attemtpts to connect to addr once a second until succeeds. Returns TcpStream on success
+///
+fn tcp_connect(addr: &str) -> TcpStream {
+    loop {
+        match TcpStream::connect(addr) {
+            Ok(s) => break s,
+            Err(e) => {
+                eprintln!("Error connecting to server: {e}, retrying in 1s...");
+                thread::sleep(Duration::from_secs(1));
+            }
+        }
+    }
+}
+
+///
+/// Formats the log message (adds timestamps and escapes)
+///
+fn format_log(message: &str) -> String {
+    let timestamp = Local::now().format("[%Y-%m-%d %H:%M:%S]").to_string();
+    format!("\x1b[90m{timestamp}\x1b[0m {message}\n")
 }
