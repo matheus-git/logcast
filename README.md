@@ -4,6 +4,10 @@
 
 A simple helper that sends logs over UDP, for programs without terminal output, such as TUIs.
 
+## Example
+
+![logcast](https://raw.githubusercontent.com/matheus-git/logcast/main/screenshots/logcast.gif)
+
 ## Usage
 
     cargo add logcast
