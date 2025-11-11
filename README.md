@@ -52,7 +52,7 @@ log!("{:?}", service);
 ### Output
 To view the logs, open another terminal and run a program that listens for TCP connections, such as ```ncat -l --keep-open 8080```, as shown in the example below.
 
-    └─$ ncat -ul --keep-open 8080 
+    └─$ ncat -l --keep-open 8080 
     [2025-11-10 20:55:04] Test
     [2025-11-10 20:55:04] Service { name: "cron.service", description: "Regular background program processing daemon", state: ServiceState { load: "loaded", active: "active", sub: "running", file: "enabled" } }
 
