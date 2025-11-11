@@ -1,13 +1,40 @@
-use std::io::{self, Write};
+use std::sync::mpsc::{self, Sender};
+use std::thread;
 use std::net::TcpStream;
+use std::io::Write;
 use chrono::Local;
+use once_cell::sync::Lazy;
 
-pub fn send_log(message: &str, address: &str) -> io::Result<()> {
-    let mut stream = TcpStream::connect(address)?;
+pub struct Logger {
+    tx: Sender<String>,
+}
 
-    let timestamp = Local::now().format("[%Y-%m-%d %H:%M:%S]").to_string();
-    let formatted = format!("\x1b[90m{}\x1b[0m {}\n", timestamp, message);
+impl Logger {
+    pub fn new(address: &str) -> Self {
+        let (tx, rx) = mpsc::channel::<String>();
+        let addr = address.to_string();
 
-    stream.write_all(formatted.as_bytes())?;
-    Ok(())
+        thread::spawn(move || {
+            while let Ok(msg) = rx.recv() {
+                match TcpStream::connect(&addr) {
+                    Ok(mut stream) => {
+                        let timestamp = Local::now().format("[%Y-%m-%d %H:%M:%S]").to_string();
+                        let formatted = format!("\x1b[90m{}\x1b[0m {}\n", timestamp, msg);
+                        if let Err(e) = stream.write_all(formatted.as_bytes()) {
+                            eprintln!("Error sending log: {}", e);
+                        }
+                    }
+                    Err(e) => eprintln!("Error connecting to server: {}", e),
+                }
+            }
+        });
+
+        Self { tx }
+    }
+
+    pub fn log(&self, message: &str) {
+        if let Err(e) = self.tx.send(message.to_string()) {
+            eprintln!("Error sending message to queue: {}", e);
+        }
+    }
 }
