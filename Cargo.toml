@@ -1,8 +1,8 @@
 [package]
 name = "logcast"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2024"
-description = "Simple helper to send logs via UDP"
+description = "Simple helper to send logs via TCP"
 license = "MIT"
 
 [dependencies]
