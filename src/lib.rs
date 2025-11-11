@@ -3,7 +3,6 @@ use std::thread;
 use std::net::TcpStream;
 use std::io::Write;
 use chrono::Local;
-use once_cell::sync::Lazy;
 
 pub struct Logger {
     tx: Sender<String>,
