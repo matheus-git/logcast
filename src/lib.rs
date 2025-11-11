@@ -102,7 +102,7 @@ impl Logger {
                             }
                         }
                     };
-                    // Após reconectar, tenta enviar novamente
+
                     if let Err(e) = stream.write_all(formatted.as_bytes()) {
                         eprintln!("Failed to send log after reconnect: {}", e);
                     }
