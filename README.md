@@ -17,41 +17,34 @@ See `examples/log.rs` for an example of integration with the [log](https://docs.
     cargo add logcast
 
 ### Create Macro
-This code defines a global, thread-safe TCP logger using a singleton (LOGGER) initialized lazily.
 
 ```rust
-// src/macros/log/mod.rs
-use logcast::Logger;
-use std::sync::LazyLock;
-
-pub static LOGGER: LazyLock<Logger> = LazyLock::new(|| Logger::new("127.0.0.1:8080"));
-
-#[macro_export]
+// src/macros.rs
 macro_rules! log {
     ($($arg:tt)*) => {{
-        $crate::LOGGER.log(&format!($($arg)*));
+        crate::LOGGER.log(&format!($($arg)*));
     }};
 }
 ```
 
-### Import LOGGER
-Import LOGGER in main.rs to allow the macro to access it from any module.
+###  Make the macro available globally and create the LOGGER
 
 ```rust
 // src/main.rs
-use macros::log::LOGGER;
+#[macro_use]
+mod macros;
+
+use std::sync::LazyLock;
+use logcast::Logger;
+
+pub static LOGGER: LazyLock<Logger> = LazyLock::new(|| Logger::new("127.0.0.1:8080"));
 ```
 
-### Import macro
+### Use macro with log!
 
 ```rust
-use crate::log;
-
 log!("Test");
 log!("{:?}", service);
-// or
-crate::log!("Test");
-crate::log!("{:?}", service);
 ```
 
 ### Output
