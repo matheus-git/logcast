@@ -49,6 +49,9 @@ use crate::log;
 
 log!("Test");
 log!("{:?}", service);
+// or
+crate::log!("Test");
+crate::log!("{:?}", service);
 ```
 
 ### Output
