@@ -16,40 +16,35 @@
 //! ```
 //!
 //! ### Create Macro
-//! This code defines a global, thread-safe TCP logger using a singleton (LOGGER) initialized lazily.
-//!
+//! 
 //! ```rust
-//! // src/macros/log/mod.rs
-//! use logcast::Logger;
-//! use std::sync::LazyLock;
-//!
-//! pub static LOGGER: LazyLock<Logger> = LazyLock::new(|| Logger::new("127.0.0.1:8080"));
-//!
-//! #[macro_export]
+//! // src/macros.rs
 //! macro_rules! log {
 //!     ($($arg:tt)*) => {{
-//!         $crate::LOGGER.log(&format!($($arg)*));
+//!         crate::LOGGER.log(&format!($($arg)*));
 //!     }};
 //! }
 //! ```
-//!
-//! ### Import LOGGER
-//! Import LOGGER in main.rs to allow the macro to access it from any module.
-//!
+//! 
+//! ###  Make the macro available globally and create the LOGGER
+//! 
 //! ```rust
 //! // src/main.rs
-//! use macros::log::LOGGER;
+//! #[macro_use]
+//! mod macros;
+//! 
+//! use std::sync::LazyLock;
+//! use logcast::Logger;
+//! 
+//! pub static LOGGER: LazyLock<Logger> = LazyLock::new(|| Logger::new("127.0.0.1:8080"));
 //! ```
-//!
-//! ### Import macro
-//!
+//! 
+//! ### Use macro with log!
+//! 
 //! ```rust
-//! use crate::log;
-//!
 //! log!("Test");
 //! log!("{:?}", service);
 //! ```
-//!
 //! ### Output
 //! To view the logs, open another terminal and run a program that listens for TCP connections, such as ```ncat -l --keep-open 8080```, as shown in the example below.
 //!```shell
