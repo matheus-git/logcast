@@ -4,8 +4,6 @@
 
 A helper that sends logs over TCP, for programs without terminal output, such as TUIs.
 
-## Example
-
 ![logcast](https://raw.githubusercontent.com/matheus-git/logcast/main/screenshots/logcast.gif)
 
 ## Usage
