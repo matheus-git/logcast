@@ -10,13 +10,22 @@ A simple helper that sends logs over TCP, for programs without terminal output, 
 
 ## Usage
 
+### Integrate with the [log](https://docs.rs/log/latest/log/index.html) crate
 See `examples/log.rs` for an example of integration with the [log](https://docs.rs/log/latest/log/index.html) crate.
 
-### Add logcast
+```rust
+// src/main.rs
+use logcast::init_on_addr;
 
-    cargo add logcast
+init_on_addr("127.0.0.1:8080");
+log::info!("The logger seems to work");
+```
 
-### Create Macro
+---
+
+Another option is to create your own macro.
+
+### Create macro
 
 ```rust
 // src/macros.rs
@@ -43,6 +52,7 @@ pub static LOGGER: LazyLock<Logger> = LazyLock::new(|| Logger::new("127.0.0.1:80
 ### Use macro with log!
 
 ```rust
+// anywhere
 log!("Test");
 log!("{:?}", service);
 ```
