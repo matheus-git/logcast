@@ -21,6 +21,14 @@ init_on_addr("127.0.0.1:8080");
 log::info!("The logger seems to work");
 ```
 
+Example output:
+
+```shell
+$ ncat -l --keep-open 8080
+INFO:systemd_manager_tui::terminal::components::details -- Test
+INFO:systemd_manager_tui::terminal::components::details -- Service { name: "bluetooth.service", description: "Bluetooth service", state: ServiceState { load: "loaded", active: "active", sub: "running", file: "enabled" } }
+```
+
 ---
 
 Another option is to create your own macro.
