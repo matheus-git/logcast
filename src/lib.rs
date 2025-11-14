@@ -2,13 +2,36 @@
 //!
 //! ![rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)
 //!
-//! A simple helper that sends logs over TCP, for programs without terminal output, such as TUIs.
+//! A helper that sends logs over TCP, for programs without terminal output, such as TUIs.
 //!
 //! ## Example
 //!
 //! ![logcast](https://raw.githubusercontent.com/matheus-git/logcast/main/screenshots/logcast.gif)
 //!
 //! ## Usage
+//!
+//! ### Integrate with the [log](https://docs.rs/log/latest/log/index.html) crate
+//! See `examples/log.rs` for an example of integration with the [log](https://docs.rs/log/latest/log/index.html) crate.
+//! 
+//! ```ignore
+//! // src/main.rs
+//! use logcast::init_on_addr;
+//! 
+//! init_on_addr("127.0.0.1:8080");
+//! log::info!("The logger seems to work");
+//! ```
+//! 
+//! Example output:
+//! 
+//! ```shell
+//! $ ncat -l --keep-open 8080
+//! INFO:systemd_manager_tui::terminal::components::details -- Test
+//! INFO:systemd_manager_tui::terminal::components::details -- Service { name: "bluetooth.service", description: "Bluetooth service", state: ServiceState { load: "loaded", active: "active", sub: "running", file: "enabled" } }
+//! ```
+//! 
+//! ---
+//! 
+//! Another option is to create your own macro.
 //!
 //! ### Add logcast
 //! ```shell
