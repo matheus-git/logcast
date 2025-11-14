@@ -33,11 +33,6 @@
 //! 
 //! Another option is to create your own macro.
 //!
-//! ### Add logcast
-//! ```shell
-//!     cargo add logcast
-//! ```
-//!
 //! ### Create Macro
 //! 
 //! ```ignore
