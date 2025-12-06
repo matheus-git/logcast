@@ -11,6 +11,10 @@ A helper that sends logs over TCP, for programs without terminal output, such as
 ### Integrate with the [log](https://docs.rs/log/latest/log/index.html) crate
 See `examples/log.rs` for an example of integration with the [log](https://docs.rs/log/latest/log/index.html) crate.
 
+```shell
+$ cargo add log
+```
+
 ```rust
 // src/main.rs
 use logcast::init_on_addr;
