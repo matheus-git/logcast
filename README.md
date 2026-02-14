@@ -2,7 +2,7 @@
 
 ![rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=rust&logoColor=white)
 
-A helper that sends logs over TCP, for programs without terminal output, such as TUIs.
+A helper that sends logs over TCP, for programs without stdout, such as TUIs.
 
 ![logcast](https://raw.githubusercontent.com/matheus-git/logcast/main/screenshots/logcast.gif)
 
